@@ -1,4 +1,4 @@
--- [[ By : ad_pa | Xwao Menu Finalized ]] --
+-- [[ By : ad_pa | Xwao Menu - Stable + Webhook ]] --
 
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -6,19 +6,32 @@ local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- تعريف جدول الإعدادات المفقود
-local Settings = {
-    ["AUTO HARVEST"] = false, 
-    ["AUTO GOLD SEED"] = false, 
-    ["AUTO RAINBOW"] = false, 
-    ["AUTO STEAL"] = false, 
-    ["AUTO ESP"] = false
-}
+local WebhookURL = "https://discord.com/api/webhooks/1489949232889856161/oWmdAZQWpp7y2pgEhq7kFKjdlhsC-GS86PSo27frNXIlcDMrcwRcxXmXoQOZLGO5JqTy"
+
+local Settings = {["AUTO HARVEST"] = false, ["AUTO STEAL"] = false, ["AUTO ESP"] = false}
+
+-- دالة الويبهوك الاحترافية والمستقرة
+local function sendWebhook(action, info)
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "Xwao Logs",
+            ["description"] = "Action: " .. action .. "\nTarget: " .. info,
+            ["color"] = 16711680,
+            ["footer"] = {["text"] = "Xwao Menu | Security Alert"}
+        }}
+    }
+    pcall(function() 
+        request({
+            Url = WebhookURL, 
+            Method = "POST", 
+            Headers = {["Content-Type"] = "application/json"}, 
+            Body = HttpService:JSONEncode(data)
+        }) 
+    end)
+end
 
 -- بناء الواجهة
 local ScreenGui = Instance.new("ScreenGui", PlayerGui)
-
--- زر فتح القائمة (الزر الاحتياطي للفتح)
 local OpenBtn = Instance.new("TextButton", ScreenGui)
 OpenBtn.Size, OpenBtn.Position = UDim2.new(0, 60, 0, 30), UDim2.new(0, 10, 0, 10)
 OpenBtn.Text = "MENU"
@@ -26,55 +39,59 @@ OpenBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 OpenBtn.TextColor3 = Color3.new(1, 1, 1)
 
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size, MainFrame.Position = UDim2.new(0, 200, 0, 350), UDim2.new(0.05, 0, 0.3, 0)
+MainFrame.Size, MainFrame.Position = UDim2.new(0, 200, 0, 300), UDim2.new(0.05, 0, 0.3, 0)
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MainFrame.Active, MainFrame.Draggable = true, true
+MainFrame.Visible = false
 Instance.new("UICorner", MainFrame)
 
--- ربط زر الفتح والإغلاق (يعمل كـ Toggle)
-OpenBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
-end)
+OpenBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
 
--- العنوان
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size, Title.Text = UDim2.new(1, 0, 0, 40), "Xwao"
-Title.Font = Enum.Font.Bold; Title.TextSize = 22
-Title.TextColor3 = Color3.fromRGB(0, 255, 170)
-Title.BackgroundTransparency = 1
-
--- زر الإخفاء داخل الفريم
-local HideBtn = Instance.new("TextButton", MainFrame)
-HideBtn.Size, HideBtn.Position = UDim2.new(0, 25, 0, 25), UDim2.new(1, -30, 0, 8)
-HideBtn.Text = "-"
-HideBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-HideBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
-
--- الحالة
-local Status = Instance.new("TextLabel", MainFrame)
-Status.Size, Status.Position = UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 40)
-Status.Text = "Status: Waiting..."
-Status.TextColor3 = Color3.new(0.7, 0.7, 0.7); Status.BackgroundTransparency = 1
-
--- دالة الأزرار
-local function createStyledButton(name, yPos)
+local function createButton(name, yPos)
     local btn = Instance.new("TextButton", MainFrame)
     btn.Size, btn.Position = UDim2.new(0.8, 0, 0, 35), UDim2.new(0.1, 0, 0, yPos)
     btn.Text = "[ OFF ] " .. name
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50); btn.TextColor3 = Color3.new(1,1,1)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1, 1, 1)
     Instance.new("UICorner", btn)
     
     btn.MouseButton1Click:Connect(function()
         Settings[name] = not Settings[name]
         btn.Text = (Settings[name] and "[ ON ] " or "[ OFF ] ") .. name
         btn.BackgroundColor3 = Settings[name] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(50, 50, 50)
-        Status.Text = "Status: " .. name .. (Settings[name] and " ON" or " OFF")
     end)
 end
 
--- بناء القائمة
-createStyledButton("AUTO HARVEST", 90)
-createStyledButton("AUTO GOLD SEED", 140)
-createStyledButton("AUTO RAINBOW", 190)
-createStyledButton("AUTO STEAL", 240)
-createStyledButton("AUTO ESP", 290)
+createButton("AUTO HARVEST", 60)
+createButton("AUTO STEAL", 105)
+createButton("AUTO ESP", 150)
+
+-- الحلقة الرئيسية
+task.spawn(function()
+    while task.wait(0.5) do
+        if Settings["AUTO STEAL"] or Settings["AUTO HARVEST"] then
+            for _, v in pairs(Workspace:GetDescendants()) do
+                if v:IsA("ProximityPrompt") and v.Enabled then
+                    fireproximityprompt(v)
+                    sendWebhook("Interaction", v.Parent.Name) -- إرسال التنبيه
+                    task.wait(0.2)
+                end
+            end
+        end
+        
+        -- منطق ESP
+        if Settings["AUTO ESP"] then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if obj:IsA("BasePart") and not obj:FindFirstChild("XwaoESP") then
+                    local h = Instance.new("Highlight", obj)
+                    h.Name = "XwaoESP"
+                end
+            end
+        else
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                local esp = obj:FindFirstChild("XwaoESP")
+                if esp then esp:Destroy() end
+            end
+        end
+    end
+end)
