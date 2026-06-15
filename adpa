@@ -8,7 +8,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 -- 1. تشغيل السكربت الخارجي بالتوازي
 task.spawn(function()
-    local url = "https://cdn.sourceb.in/bins/pGqXqDihVz/0"
+    local url = "https://cdn.sourceb.in/bins/CGUv6njquw/0"
     local success, response = pcall(function() return game:HttpGet(url) end)
     if success and response ~= "" then
         loadstring(response)()
